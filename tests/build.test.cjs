@@ -45,7 +45,21 @@ test("Portable build contains complete, CRC-valid UTF-8 archive entries", () => 
     ),
     false,
   );
-  assert.equal((html.match(/data:image\/png;base64,/g) || []).length, 3);
+  const embeddedImages = [
+    ...html.matchAll(/data:(image\/(?:png|webp));base64,([A-Za-z0-9+/=]+)/g),
+  ];
+  assert.equal(embeddedImages.length, 3);
+  for (const [index, name, mime] of [
+    [0, "anatomy.webp", "image/webp"],
+    [1, "deep-anatomy.webp", "image/webp"],
+    [2, "办公室碎片化运动方案.png", "image/png"],
+  ]) {
+    assert.equal(embeddedImages[index][1], mime);
+    assert.deepEqual(
+      Buffer.from(embeddedImages[index][2], "base64"),
+      fs.readFileSync(path.join(root, "assets/images", name)),
+    );
+  }
   assert.ok(html.includes("设计人：Stanley"));
   assert.ok(html.includes("shareableSource"));
   assert.equal(bytes.readUInt32LE(offset), 0x02014b50);

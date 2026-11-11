@@ -670,7 +670,7 @@ const EXERCISES = [
 ];
 
 const ASSETS = {
-  body: "assets/images/anatomy.png",
-  deep: "assets/images/deep-anatomy.png",
+  body: "assets/images/anatomy.webp",
+  deep: "assets/images/deep-anatomy.webp",
   office: "assets/images/办公室碎片化运动方案.png",
 };

@@ -24,7 +24,9 @@
 
 ## 资源与本地归档
 
-`assets/images/anatomy.png` 是正背面底图，`deep-anatomy.png` 是深层剖示底图，两者来自原版图像生成过程。办公室方案 PNG 沿用原版分享附件；本项目不维护该方案的 PDF 或生成脚本。
+`assets/images/anatomy.webp` 是正背面底图，`deep-anatomy.webp` 是深层剖示底图，两者来自原版图像生成过程。网页使用无损 WebP 减少下载量，原始 PNG 保留在 Git 历史和本机历史归档中。办公室方案 PNG 沿用原版分享附件；本项目不维护该方案的 PDF 或生成脚本。
+
+WebP 转换保持原始尺寸，不缩放、不调色；使用 Pillow 的 `lossless=True, quality=100, method=6, exact=True` 参数。这里的 quality 参数控制无损压缩的计算投入，不表示有损画质。转换后将原图与输出解码为 RGBA，逐字节核验像素一致。本机的 `local/verification/webp-lossless.json` 记录体积、哈希及核验结果。分享构建按扩展名写入正确的图片 MIME 类型，办公室 PNG 附件格式保持不变。
 
 本机的 `local/archive/2026-11-10/` 完整保存整理前的图谱目录；`local/reference/` 保存早期两张肌肉示意图及提示词。迁移文件清单与 SHA-256 位于 `local/migration-manifest.json`。这些文件不属于公开仓库，克隆项目无需拥有它们。
 

@@ -16,8 +16,12 @@ async function build() {
   vm.runInNewContext(data + ";globalThis.assets = ASSETS;", context);
   const assets = {};
   for (const [key, filename] of Object.entries(context.assets)) {
+    const mime = { ".png": "image/png", ".webp": "image/webp" }[
+      path.extname(filename).toLowerCase()
+    ];
+    if (!mime) throw new Error(`Unsupported image format: ${filename}`);
     const bytes = await fs.readFile(path.join(root, filename));
-    assets[key] = "data:image/png;base64," + bytes.toString("base64");
+    assets[key] = `data:${mime};base64,` + bytes.toString("base64");
   }
 
   // Inline only the explicitly declared local stylesheet and scripts.

@@ -30,7 +30,7 @@ node scripts/build-share.cjs
 | `index.html` | 页面结构与本地资源入口 |
 | `css/` | 页面样式 |
 | `js/` | 数据、肌群映射、解剖几何、ZIP 打包与页面交互 |
-| `assets/images/` | 两张解剖底图与办公室方案 PNG |
+| `assets/images/` | 两张无损 WebP 解剖底图与办公室方案 PNG |
 | `scripts/` | 无第三方依赖的分享版构建脚本 |
 | `tests/` | 内容基准、模型与构建回归测试 |
 | `docs/` | 维护说明 |
