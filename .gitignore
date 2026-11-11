@@ -1,0 +1,27 @@
+# Local archives, references, migration manifests and browser evidence
+/local/
+
+# Reproducible sharing artifacts
+/dist/
+
+# Dependencies, caches and reports
+node_modules/
+__pycache__/
+*.py[cod]
+.cache/
+coverage/
+test-results/
+playwright-report/
+*.log
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.bak

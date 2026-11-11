@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>训练肌肉图谱 · 双向探索</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="brandmark">↗</div>
+      <div>
+        <div class="eyebrow">MY MOVEMENT ATLAS</div>
+        <h1>训练肌肉图谱</h1>
+      </div>
+      <p>从动作找肌肉，也从肌肉找动作。</p>
+      <span class="local">● 本地 · 离线可用</span>
+    </header>
+    <main class="workspace">
+      <nav class="catalog panel" aria-label="训练动作目录">
+        <div class="panel-head">
+          <span class="eyebrow">动作目录</span><span id="count">35 个动作</span>
+        </div>
+        <label class="search"
+          ><span aria-hidden="true">⌕</span
+          ><input
+            id="search"
+            type="search"
+            aria-label="搜索全部动作或肌肉"
+            placeholder="搜索动作或肌肉"
+          /><button
+            id="clear-search"
+            type="button"
+            aria-label="清空搜索"
+            hidden
+          >
+            ×
+          </button></label
+        >
+        <p class="nav-hint">悬停探索 · 点击固定 · Esc 取消</p>
+        <div class="purpose-legend">
+          <span class="purpose-badge strength">主训</span>主训练<span
+            class="purpose-badge office"
+            >办公</span
+          >办公室运动<span class="purpose-badge shared">共用</span>两者均可
+        </div>
+        <div id="exercise-list"></div>
+        <p id="hidden-matches" class="hidden-matches" hidden></p>
+        <div class="catalog-foot">
+          <span class="dot primary"></span>主要目标
+          <span class="dot secondary"></span>辅助参与
+        </div>
+      </nav>
+      <section class="atlas panel" aria-labelledby="atlas-title">
+        <div class="atlas-top">
+          <div>
+            <span class="eyebrow">解剖图谱</span>
+            <h2 id="atlas-title">每一块肌肉，都有对应的动作</h2>
+          </div>
+          <span id="state" class="status">自由探索</span>
+        </div>
+        <div class="atlas-tools">
+          <p>将鼠标移到肌肉或名称上</p>
+          <label
+            ><input
+              id="secondary-toggle"
+              type="checkbox"
+            />显示辅助与稳定</label
+          >
+        </div>
+        <div id="anatomy"></div>
+        <div class="deep-heading">
+          <span>局部剖示</span><span>深层与易遮挡肌群 · 同样可选</span>
+        </div>
+        <div id="deep-diagrams"></div>
+        <div class="map-footer">
+          <span>正背面与局部图同步高亮</span
+          ><span>颜色表示训练关系，不代表激活强度</span>
+        </div>
+      </section>
+      <aside class="details panel" aria-labelledby="detail-title">
+        <div class="panel-head">
+          <span class="eyebrow">训练参考</span
+          ><button id="unpin" hidden>取消固定</button>
+        </div>
+        <div id="detail-content"></div>
+        <div
+          id="live"
+          class="sr-only"
+          aria-live="polite"
+          aria-atomic="true"
+        ></div>
+        <div class="detail-footer">点击肌肉，留住它的可选动作。</div>
+      </aside>
+    </main>
+    <footer class="page-footer">
+      <span>我的运动计划 · 35 个动作 · 25 组肌肉与纤维区域</span>
+      <details>
+        <summary>资料与图示说明</summary>
+        <p>
+          根据《我的运动计划》、办公室碎片化运动方案与此前两张肌肉图谱整理，参考
+          <a
+            href="https://www.nasm.org/workout-exercise-guidance"
+            target="_blank"
+            rel="noreferrer"
+            >NASM 动作库</a
+          >。解剖插画由图像工具生成，交互轮廓按图示位置描绘，仅作训练定位参考。深层肌群用局部剖示定位；只列当前计划中的主要及部分辅助肌群。肩胛控制和核心稳定动作的关联表示训练重点。图中左右侧同步标记，单侧动作可交替完成。图片、文字和代码均保存在本地，无需联网。
+        </p>
+      </details>
+    </footer>
+    <div class="bottom-bar">
+      <small>建议使用 PC 端，以 1920 × 1080 分辨率查看。</small
+      ><span class="designer-credit">设计人：Stanley</span
+      ><a
+        id="download-source"
+        href="dist/训练肌肉图谱.zip"
+        download="训练肌肉图谱.zip"
+        ><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+          <circle cx="18" cy="5" r="3" />
+          <circle cx="6" cy="12" r="3" />
+          <circle cx="18" cy="19" r="3" />
+          <path d="m8.5 10.5 7-4m-7 7 7 4" /></svg
+        ><span>获取源码</span></a
+      ><span id="download-status" role="status" aria-live="polite"></span>
+    </div>
+    <script src="js/data.js"></script>
+    <script src="js/model.js"></script>
+    <script src="js/anatomy.js"></script>
+    <script src="js/download.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
