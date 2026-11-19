@@ -31,7 +31,7 @@
     function exerciseMatches(e, query) {
       const q = query.trim().toLowerCase();
       const usage =
-        e.name === "站姿提踵"
+        e.tag === "共用"
           ? "共用 主训练 办公室运动"
           : e.tag === "办公室"
             ? "办公室运动"

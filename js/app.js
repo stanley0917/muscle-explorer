@@ -8,8 +8,9 @@ const escapeHtml = (s) =>
       ],
   );
 const model = AtlasModel.createModel(EXERCISES, MUSCLES);
+const exerciseTotal = `${EXERCISES.length} 个动作`;
 const purpose = (e) =>
-  e.name === "站姿提踵"
+  e.tag === "共用"
     ? { kind: "shared", short: "共用", label: "主训练 / 办公室运动" }
     : e.tag === "办公室"
       ? { kind: "office", short: "办公", label: "办公室运动" }
@@ -66,7 +67,9 @@ const showSecondary = () => $("#secondary-toggle").checked;
 const query = () => $("#search").value;
 function renderList() {
   const visible = EXERCISES.filter((e) => model.exerciseMatches(e, query()));
-  $("#count").textContent = visible.length + " / 35 个动作";
+  $("#count").textContent = query().trim()
+    ? `${visible.length} / ${exerciseTotal}`
+    : exerciseTotal;
   $("#clear-search").hidden = !query();
   $("#exercise-list").innerHTML = ["躯干", "四肢"]
     .map((group) => {
@@ -84,7 +87,34 @@ function renderDetails(active) {
     html = `<div class="welcome-icon" aria-hidden="true">↔</div><h2 id="detail-title">从你想练的地方开始</h2><p class="intro">这张图谱把动作、肌肉位置和训练要领放在一起。</p><div class="welcome-guide"><p><strong>找肌肉</strong><br>悬停左侧动作，查看它主要练习哪些肌肉。</p><p><strong>找动作</strong><br>悬停图中的肌肉或名称，查看可以选用的动作。</p><p><strong>留住结果</strong><br>点击肌肉或动作可固定；临时预览后，移开鼠标即可恢复。按 Esc 回到这里。</p></div><p class="minor">上方正背面图显示表层位置，下方局部剖示补充深层肌群。</p>`;
   } else if (active.kind === "exercise") {
     const e = model.byId.get(active.id);
-    html = `<div class="detail-meta"><span class="type">${e.group}训练</span><span class="purpose-detail ${purpose(e).kind}">${purpose(e).label}</span></div><h2 id="detail-title">${e.name}</h2><p class="intro">${e.focus || "用可控制的动作，找到主要发力部位。"}</p>${purpose(e).kind !== "strength" ? `<p class="purpose-note">${purpose(e).kind === "shared" ? "同一动作同时用于主训练与办公室活动；办公时以轻松、可控制的练习为主。" : "用于久坐间隙的轻量活动；保持轻松，不追求力竭。"}</p>` : ""}<div class="section-title">主要训练</div><div class="tags">${e.primary.map((id) => `<span>${MUSCLES[id].name}</span>`).join("")}</div><div class="section-title">怎么做</div><ol class="steps">${e.steps.map((s) => `<li>${s}</li>`).join("")}</ol><div class="note-box"><span>要点说明</span><p>${e.note}</p></div>${e.secondary.length ? `<div class="section-title">辅助与稳定</div><p class="minor">${names(e.secondary)}。仅列重点参与肌群。</p>` : ""}`;
+    const use = purpose(e);
+    html = `
+      <div class="detail-meta">
+        <span class="type">${e.group}训练</span>
+        <span class="purpose-detail ${use.kind}">${use.label}</span>
+      </div>
+      <h2 id="detail-title">${e.name}</h2>
+      <p class="intro">${e.focus}</p>
+      <div class="section-title">主要训练</div>
+      <div class="tags">${e.primary.map((id) => `<span>${MUSCLES[id].name}</span>`).join("")}</div>
+      ${e.secondary.length ? `<p class="muscle-assist"><span>辅助与稳定</span>${names(e.secondary)}</p>` : ""}
+      <div class="section-title">怎么做</div>
+      ${e.illustration ? `
+        <figure class="exercise-illustration">
+          <img src="${ASSETS[e.illustration.asset]}" alt="${escapeHtml(e.illustration.alt)}" width="320" height="160">
+          <figcaption aria-hidden="true">
+            <span>起始位</span>
+            <span>发力到位</span>
+          </figcaption>
+        </figure>` : ""}
+      <ol class="steps">${e.steps.map((step) => `<li>${step}</li>`).join("")}</ol>
+      <div class="note-box"><span>动作要点</span><p>${e.note}</p></div>
+      ${e.plan || e.officePlan ? `
+        <dl class="training-plan">
+          ${e.plan ? `<div><dt>主训安排</dt><dd>${e.plan}</dd></div>` : ""}
+          ${e.officePlan ? `<div><dt>办公安排</dt><dd>${e.officePlan}，保持轻松</dd></div>` : ""}
+        </dl>` : ""}
+    `;
   } else {
     const m = MUSCLES[active.id],
       r = model.reverse[active.id];
@@ -308,7 +338,7 @@ function shareableSource() {
     copy.querySelector("#" + id).setAttribute("hidden", "");
   copy.querySelector("#hidden-matches").textContent = "";
   copy.querySelector("#state").textContent = "自由探索";
-  copy.querySelector("#count").textContent = "35 个动作";
+  copy.querySelector("#count").textContent = exerciseTotal;
   copy.querySelector("#download-status").textContent = "";
   copy.querySelector("#download-source").removeAttribute("aria-busy");
   return "<!DOCTYPE html>\n" + copy.outerHTML;

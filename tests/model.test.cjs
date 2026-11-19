@@ -20,21 +20,57 @@ const digest = (value) =>
 assert.equal(digest(muscles), approved.muscles);
 assert.equal(digest(exercises), approved.exercises);
 const model = createModel(exercises, muscles);
-const named = (names) =>
-  exercises
-    .filter((e) => names.includes(e.name))
-    .map((e) => e.id)
-    .sort();
-test("All 35 original actions retain unique IDs, two groups and complete guidance", () => {
-  assert.equal(exercises.length, 35);
-  assert.equal(new Set(exercises.map((e) => e.id)).size, 35);
+const torso = [
+  "平板哑铃卧推",
+  "弹力带高位下拉",
+  "引体向上",
+  "单臂哑铃划船",
+  "平板支撑",
+  "上斜哑铃卧推",
+  "哑铃夹胸",
+  "弹力带直臂下压",
+  "弹力带坐姿划船",
+  "死虫式",
+  "墙壁俯卧撑",
+];
+const limbs = [
+  "臀桥",
+  "高脚杯深蹲",
+  "罗马尼亚硬拉",
+  "侧平举",
+  "站姿提踵",
+  "弹力带腿弯举",
+  "杠铃弯举",
+  "弹力带三头肌下压",
+  "弹力带面拉",
+  "箭步蹲",
+  "垂直弯举",
+  "靠墙天使",
+  "椅上臂屈伸",
+  "靠墙静蹲",
+  "徒手深蹲",
+];
+test("The catalog contains the requested exercises in order with complete guidance", () => {
+  assert.equal(new Set(exercises.map((e) => e.id)).size, 26);
   assert.deepEqual(
-    [...new Set(exercises.map((e) => e.group))],
-    ["躯干", "四肢"],
+    exercises.map((e) => [e.group, e.name]),
+    [
+      ...torso.map((name) => ["躯干", name]),
+      ...limbs.map((name) => ["四肢", name]),
+    ],
   );
+  const office = [torso.at(-1), ...limbs.slice(-4)];
   for (const e of exercises) {
     assert.equal(e.steps.length, 3);
-    assert.ok(e.note);
+    assert.ok(e.focus && e.note);
+    assert.equal(
+      e.tag,
+      office.includes(e.name)
+        ? "办公室"
+        : e.name === "站姿提踵"
+          ? "共用"
+          : "力量训练",
+    );
     for (const id of [...e.primary, ...e.secondary]) assert.ok(muscles[id]);
   }
 });
@@ -50,19 +86,18 @@ test("Every muscle has real geometry or a cutaway and meaningful metadata", () =
 });
 test("Reverse mappings distinguish prime targets from assisting participation", () => {
   assert.deepEqual(
-    model.reverse.lats.primary.map((e) => e.id).sort(),
-    named([
-      "引体向上",
+    model.reverse.lats.primary.map((e) => e.name),
+    [
       "弹力带高位下拉",
-      "弹力带坐姿划船",
+      "引体向上",
       "单臂哑铃划船",
-      "俯身弹力带划船",
       "弹力带直臂下压",
-    ]),
+      "弹力带坐姿划船",
+    ],
   );
   assert.deepEqual(
-    model.reverse.triceps.primary.map((e) => e.id).sort(),
-    named(["弹力带三头肌下压", "椅上臂屈伸"]),
+    model.reverse.triceps.primary.map((e) => e.name),
+    ["弹力带三头肌下压", "椅上臂屈伸"],
   );
   assert.equal(model.reverse.gluteMed.primary.length, 0);
   assert.equal(model.reverse.gluteMed.secondary.length, 1);
@@ -107,11 +142,19 @@ test("All action roles and reverse indexes agree, secondary switch does not prom
 test("Search works across categories; no-result and empty query are deterministic", () => {
   assert.equal(
     exercises.filter((e) => model.exerciseMatches(e, "")).length,
-    35,
+    26,
   );
   assert.equal(
     exercises.filter((e) => model.exerciseMatches(e, "不存在动作")).length,
     0,
+  );
+  assert.equal(
+    exercises.filter((e) => model.exerciseMatches(e, "俯身弹力带划船")).length,
+    0,
+  );
+  assert.deepEqual(
+    exercises.filter((e) => model.exerciseMatches(e, "共用")).map((e) => e.name),
+    ["站姿提踵"],
   );
   assert.ok(
     exercises

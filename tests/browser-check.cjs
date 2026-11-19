@@ -46,6 +46,7 @@ async function main() {
   execFileSync(process.execPath, [path.join(root, "scripts/build-share.cjs")]);
   const browser = await chromium.launch({
     headless: true,
+    downloadsPath: output,
     ...(process.env.BROWSER_EXECUTABLE
       ? { executablePath: process.env.BROWSER_EXECUTABLE }
       : {}),
@@ -77,7 +78,8 @@ async function main() {
       });
       await page.goto(pathToFileURL(path.join(root, filename)).href);
       await page.locator(".exercise-btn").first().waitFor();
-      assert.equal(await page.locator(".exercise-btn").count(), 35);
+      assert.equal(await page.locator(".exercise-btn").count(), 26);
+      assert.equal(await page.locator("#count").textContent(), "26 个动作");
       const layouts = [];
       for (const [width, height] of [
         [1920, 1080],
@@ -91,11 +93,15 @@ async function main() {
             return { x: r.x, y: r.y, right: r.right };
           };
           const catalog = document.querySelector(".catalog");
+          const list = document.querySelector("#exercise-list");
           return {
             catalog: box(".catalog"),
             atlas: box(".atlas"),
             details: box(".details"),
-            scroll: catalog.scrollHeight - catalog.clientHeight,
+            scroll: Math.max(
+              catalog.scrollHeight - catalog.clientHeight,
+              list.scrollHeight - list.clientHeight,
+            ),
           };
         });
         assert.ok(
@@ -103,6 +109,10 @@ async function main() {
             layout.atlas.x < layout.details.x,
         );
         assert.ok(Math.abs(layout.catalog.y - layout.details.y) < 2);
+        assert.ok(
+          layout.details.right - layout.details.x >
+            layout.catalog.right - layout.catalog.x,
+        );
         if (width === 1920)
           assert.ok(layout.scroll <= 1, JSON.stringify(layout));
         layouts.push({ width, height, ...layout });
@@ -112,8 +122,8 @@ async function main() {
         });
       }
       await page.setViewportSize({ width: 1920, height: 1080 });
-      // Exercise every mapping against the live rendered view.
-      const mappings = await page.evaluate(() => {
+      // Check the rendered muscle highlights and illustration for every exercise.
+      const mappings = await page.evaluate(async () => {
         const results = [];
         for (const exercise of EXERCISES) {
           document
@@ -126,12 +136,19 @@ async function main() {
               ),
             ),
           ].sort();
+          const image = document.querySelector(".exercise-illustration img");
+          await image.decode();
+          const { width, height } = image.getBoundingClientRect();
           results.push({
             id: exercise.id,
             title: document.querySelector("#detail-title").textContent,
             expectedTitle: exercise.name,
             actual,
             expected: Object.keys(model.exerciseRoles(exercise, false)).sort(),
+            illustrationMatches:
+              image.getAttribute("src") === ASSETS[exercise.illustration.asset] &&
+              image.alt === exercise.illustration.alt,
+            illustrationSize: [image.naturalWidth, image.naturalHeight, width, height],
           });
         }
         return results;
@@ -139,6 +156,8 @@ async function main() {
       for (const result of mappings) {
         assert.equal(result.title, result.expectedTitle);
         assert.deepEqual(result.actual, result.expected);
+        assert.ok(result.illustrationMatches, result.title);
+        assert.deepEqual(result.illustrationSize, [320, 160, 320, 160], result.title);
       }
       await page.keyboard.press("Escape");
       const reverse = await page.evaluate(() =>
@@ -167,12 +186,29 @@ async function main() {
         await page.locator("#detail-title").textContent(),
         "平板哑铃卧推",
       );
+      const illustration = page.locator(".exercise-illustration img");
+      await page.locator(".details").screenshot({
+        path: path.join(output, `${edition}-flat-dumbbell-bench-press.png`),
+      });
       await page.locator(".exercise-btn").first().click();
       await page.locator(".exercise-btn").nth(1).hover();
       assert.equal(
         await page.locator("#detail-title").textContent(),
-        "上斜哑铃卧推",
+        "弹力带高位下拉",
       );
+      assert.match(await illustration.getAttribute("alt"), /^弹力带高位下拉/);
+      await illustration.evaluate((img) => img.decode());
+      await page.locator(".details").screenshot({
+        path: path.join(output, `${edition}-resistance-band-lat-pulldown.png`),
+      });
+      await page.locator('.exercise-btn[data-id="e6"]').hover();
+      assert.match(await illustration.getAttribute("alt"), /^引体向上/);
+      await page.locator('.exercise-btn[data-id="e3"]').hover();
+      assert.equal(await page.locator("#detail-title").textContent(), "哑铃夹胸");
+      await illustration.evaluate((img) => img.decode());
+      await page.locator(".details").screenshot({
+        path: path.join(output, `${edition}-dumbbell-chest-fly.png`),
+      });
       await page.locator(".masthead").hover();
       await page.waitForTimeout(300);
       assert.equal(
@@ -188,15 +224,24 @@ async function main() {
       await page.locator("#search").fill("不存在动作");
       assert.equal(await page.locator(".exercise-btn").count(), 0);
       await page.locator("#clear-search").click();
-      assert.equal(await page.locator(".exercise-btn").count(), 35);
+      assert.equal(await page.locator(".exercise-btn").count(), 26);
       await page.locator(".exercise-btn").first().focus();
       await page.keyboard.press("ArrowRight");
-      assert.equal(await page.locator(":focus").getAttribute("data-id"), "e2");
+      assert.equal(await page.locator(":focus").getAttribute("data-id"), "e7");
       await page.keyboard.press("Enter");
       assert.equal(await page.locator("#unpin").isVisible(), true);
       await page.keyboard.press("Escape");
       await page.locator('.deep-card[data-id="brachialis"]').click();
       assert.equal(await page.locator(".detail-cutaway").count(), 1);
+      await page.locator('.exercise-btn[data-id="e24"]').click();
+      assert.deepEqual(
+        await page.locator(".training-plan dd").allTextContents(),
+        ["3 组 × 15–20 次", "1 组 × 15–25 次，保持轻松"],
+      );
+      await page.screenshot({
+        path: path.join(output, `${edition}-training-reference.png`),
+        fullPage: true,
+      });
       // Load SVG image sources explicitly too, detecting broken file paths in offline mode.
       assert.equal(
         await page.evaluate(async () => {
@@ -228,7 +273,14 @@ async function main() {
         path.join(output, `${edition}-unpacked`),
       );
       await page.goto(pathToFileURL(extracted).href);
-      assert.equal(await page.locator(".exercise-btn").count(), 35);
+      assert.equal(await page.locator(".exercise-btn").count(), 26);
+      const illustratedExercises = await page.evaluate(() =>
+        EXERCISES.filter((e) => e.illustration).map((e) => e.id),
+      );
+      for (const id of illustratedExercises) {
+        await page.locator(`.exercise-btn[data-id="${id}"]`).click();
+        await illustration.evaluate((img) => img.decode());
+      }
       const againPromise = page.waitForEvent("download");
       await page.locator("#download-source").click();
       const again = await againPromise;
@@ -240,6 +292,7 @@ async function main() {
         edition,
         layouts,
         actions: mappings.length,
+        illustrations: mappings.length,
         muscles: reverse.length,
         errors,
         download: "passed",

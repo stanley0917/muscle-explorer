@@ -2,6 +2,7 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+const vm = require("node:vm");
 const { execFileSync } = require("node:child_process");
 const { crc32 } = require("../js/download.js");
 const root = path.resolve(__dirname, "..");
@@ -48,16 +49,17 @@ test("Portable build contains complete, CRC-valid UTF-8 archive entries", () => 
   const embeddedImages = [
     ...html.matchAll(/data:(image\/(?:png|webp));base64,([A-Za-z0-9+/=]+)/g),
   ];
-  assert.equal(embeddedImages.length, 3);
-  for (const [index, name, mime] of [
-    [0, "anatomy.webp", "image/webp"],
-    [1, "deep-anatomy.webp", "image/webp"],
-    [2, "办公室碎片化运动方案.png", "image/png"],
-  ]) {
+  const assets = vm.runInNewContext(
+    fs.readFileSync(path.join(root, "js/data.js"), "utf8") + "\nASSETS;",
+  );
+  const assetPaths = Object.values(assets);
+  assert.equal(embeddedImages.length, assetPaths.length);
+  for (const [index, filename] of assetPaths.entries()) {
+    const mime = path.extname(filename) === ".png" ? "image/png" : "image/webp";
     assert.equal(embeddedImages[index][1], mime);
     assert.deepEqual(
       Buffer.from(embeddedImages[index][2], "base64"),
-      fs.readFileSync(path.join(root, "assets/images", name)),
+      fs.readFileSync(path.join(root, filename)),
     );
   }
   assert.ok(html.includes("设计人：Stanley"));

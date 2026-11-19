@@ -8,6 +8,14 @@
 
 浏览器按 data、model、anatomy、download、app 的顺序加载普通脚本。图片使用相对路径，不依赖运行时网络请求。保留这种加载方式才能继续直接双击 HTML 使用。
 
+## 动作示意图
+
+1. 每次做一个动作。先对照《我的运动计划》和网页要领，确定支撑方式、器械位置和发力方向，再选出发力前与动作到位的两帧。两帧要能看出这个动作的关键变化。
+2. 用已确认的平板哑铃卧推图作画风参考，通过 ImageGen 生成新图。沿用浅灰绿色背景、深青色上衣、炭灰色长裤和清楚的轮廓。网页提供帧标签，图片里无需文字。
+3. 两帧固定机位、焦距、人物比例和器械位置。双侧对称动作可以从身体中线取景，便于核对两侧。用斜视角时，以地面、器械和肩线为参照，检查两帧的近远关系是否一致。逐帧核对手与器械的接触、腕肘衔接和支撑点。
+4. 输出一张 320 × 160 像素的 WebP，左侧放起始位，右侧放发力到位。裁去多余留白后，给每格上下各预留约 8 像素，并在实际显示尺寸下检查头、手、脚和器械是否完整清楚。先保证动作可辨认，再压缩文件。
+5. 将图片放到 `assets/images/exercises/`，在 `js/data.js` 的 `ASSETS` 和对应动作的 `illustration` 中登记。替代文本用文字描述左右两帧的变化。重新生成分享版，分别打开本地版、单文件版和分享包解压后的网页，确认同一动作能显示正确图片。
+
 ## 分享版
 
 在项目根目录执行 `node scripts/build-share.cjs`。脚本读取首页、CSS、JS 和图片，内嵌到一个 HTML 中，再生成包含该 HTML 和办公室方案 PNG 的 ZIP。只使用 Node.js 内置模块，无需 npm install。
@@ -24,9 +32,9 @@
 
 ## 资源与本地归档
 
-`assets/images/anatomy.webp` 是正背面底图，`deep-anatomy.webp` 是深层剖示底图，两者来自原版图像生成过程。网页使用无损 WebP 减少下载量，原始 PNG 保留在 Git 历史和本机历史归档中。办公室方案 PNG 沿用原版分享附件；本项目不维护该方案的 PDF 或生成脚本。
+`assets/images/anatomy.webp` 是正背面底图，`deep-anatomy.webp` 是深层剖示底图，两者来自原版图像生成过程。两张底图使用无损 WebP 减少下载量，原始 PNG 保留在 Git 历史和本机历史归档中。办公室方案 PNG 沿用原版分享附件；本项目不维护该方案的 PDF 或生成脚本。
 
-WebP 转换保持原始尺寸，不缩放、不调色；使用 Pillow 的 `lossless=True, quality=100, method=6, exact=True` 参数。这里的 quality 参数控制无损压缩的计算投入，不表示有损画质。转换后将原图与输出解码为 RGBA，逐字节核验像素一致。本机的 `local/verification/webp-lossless.json` 记录体积、哈希及核验结果。分享构建按扩展名写入正确的图片 MIME 类型，办公室 PNG 附件格式保持不变。
+底图转换沿用原始尺寸和颜色，使用 Pillow 的 `lossless=True, quality=100, method=6, exact=True` 参数。这里的 `quality` 参数控制无损压缩的计算投入。转换后将原图与输出解码为 RGBA，逐字节核验像素一致。本机的 `local/verification/webp-lossless.json` 记录体积、哈希及核验结果。分享构建按扩展名写入正确的图片 MIME 类型。
 
 本机的 `local/archive/2026-11-10/` 完整保存整理前的图谱目录；`local/reference/` 保存早期两张肌肉示意图及提示词。迁移文件清单与 SHA-256 位于 `local/migration-manifest.json`。这些文件不属于公开仓库，克隆项目无需拥有它们。
 

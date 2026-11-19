@@ -499,13 +499,13 @@ h1 {
   flex: none;
 }
 #detail-content {
-  padding: 10px 20px 22px;
+  padding: 14px 22px 24px;
   overflow: auto;
   scrollbar-width: thin;
   flex: 1;
 }
 .detail-meta {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
   display: flex;
   gap: 9px;
@@ -521,16 +521,16 @@ h1 {
   overflow-wrap: anywhere;
 }
 .intro {
-  font-size: 12px;
-  line-height: 1.9;
-  color: #687c70;
-  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #536d61;
+  margin: 0 0 18px;
 }
 .section-title {
-  font-size: 11px;
-  color: var(--muted);
-  margin: 20px 0 9px;
-  letter-spacing: 1px;
+  font-size: 12px;
+  font-weight: 650;
+  color: #526b61;
+  margin: 18px 0 8px;
 }
 .tags {
   display: flex;
@@ -538,11 +538,43 @@ h1 {
   flex-wrap: wrap;
 }
 .tags span {
-  font-size: 11px;
+  font-size: 12px;
   padding: 4px 8px;
   color: #a3563d;
   background: var(--main-bg);
   border-radius: 6px;
+}
+.muscle-assist {
+  font-size: 12px;
+  color: #5b7168;
+  margin: 8px 0 0;
+}
+.muscle-assist span {
+  margin-right: 8px;
+  font-weight: 650;
+}
+.exercise-illustration {
+  width: 320px;
+  max-width: 100%;
+  margin: 0 auto 14px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #f0f4ee;
+}
+.exercise-illustration img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.exercise-illustration figcaption {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 4px 0 6px;
+  border-top: 1px solid var(--line);
+  color: var(--teal);
+  font-size: 11px;
+  font-weight: 650;
+  text-align: center;
 }
 .steps {
   list-style: none;
@@ -552,10 +584,10 @@ h1 {
 }
 .steps li {
   counter-increment: step;
-  padding: 0 0 16px 28px;
+  padding: 0 0 10px 28px;
   position: relative;
-  font-size: 12px;
-  line-height: 1.85;
+  font-size: 14px;
+  line-height: 1.7;
 }
 .steps li:before {
   content: counter(step);
@@ -578,13 +610,33 @@ h1 {
   margin-top: 10px;
 }
 .note-box > span {
-  font-size: 10px;
-  color: #839078;
+  font-size: 11px;
+  font-weight: 650;
+  color: #547369;
 }
 .note-box p {
-  font-size: 12px;
-  line-height: 1.85;
-  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.75;
+  margin: 4px 0 0;
+}
+.training-plan {
+  margin: 14px 0 0;
+  font-size: 13px;
+}
+.training-plan div {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  border-top: 1px solid var(--line);
+  padding: 8px 0;
+}
+.training-plan dt {
+  flex: none;
+  color: var(--teal);
+  font-weight: 650;
+}
+.training-plan dd {
+  margin: 0;
 }
 .detail-footer {
   border-top: 1px solid var(--line);
@@ -610,7 +662,7 @@ h1 {
   border: 1px solid #e9d4c8;
   border-radius: 7px;
   background: #fff9f4;
-  font-size: 11px;
+  font-size: 12px;
   text-align: left;
   padding: 8px 10px;
 }
@@ -630,8 +682,8 @@ h1 {
   color: #a8b4a8;
 }
 .muscle-fact {
-  font-size: 12px;
-  line-height: 1.9;
+  font-size: 14px;
+  line-height: 1.75;
   margin: 0;
 }
 .minor {
@@ -714,12 +766,15 @@ h1 {
   font-size: 21px;
 }
 .workspace {
-  grid-template-columns: 360px minmax(700px, 1fr) 330px;
+  grid-template-columns: 300px minmax(700px, 1fr) 390px;
   gap: 14px;
   min-width: 1480px;
   padding: 0 24px;
 }
-.catalog,
+.catalog {
+  min-height: 0;
+  max-height: max(680px, calc(100vh - 122px));
+}
 .details {
   height: calc(100vh - 122px);
   min-height: 790px;
@@ -760,7 +815,7 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 4px;
-  min-height: 27px;
+  min-height: 34px;
   padding: 4px 6px;
   font-size: 11px;
 }
@@ -819,13 +874,6 @@ h1 {
 .purpose-detail {
   border-radius: 4px;
   padding: 1px 6px;
-}
-.purpose-note {
-  border-left: 2px solid #8fb4c4;
-  padding-left: 9px;
-  color: #647c86;
-  font-size: 11px;
-  line-height: 1.8;
 }
 .candidate .purpose-badge {
   margin-left: 7px;
